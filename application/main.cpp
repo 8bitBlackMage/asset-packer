@@ -18,10 +18,30 @@ void compressFiles (const std::string& path)
             writer.addFileToList (i->path());
         }
     }
+    indicators::show_console_cursor (false);
+    indicators::ProgressBar bar {
+        indicators::option::BarWidth { 50 },
+        indicators::option::Start { "[" },
+        indicators::option::Fill { "#" },
+        indicators::option::Lead { "$" },
+        indicators::option::Remainder { "-" },
+        indicators::option::End { " ]" },
+        indicators::option::PostfixText {},
+        indicators::option::ForegroundColor { indicators::Color::white },
+        indicators::option::ShowPercentage { true },
+        indicators::option::FontStyles { std::vector<indicators::FontStyle> { indicators::FontStyle::bold } }
+    };
 
-    writer.writePakFile();
+    int progressCounter = 0;
+    writer.writePakFile ([&] (int numFiles, const std::string& fileName)
+                         {
+        int incAmount = 100 / numFiles;
+        bar.set_option (indicators::option::PostfixText { "ProcessingFile: " + fileName });
+        progressCounter += incAmount;
+        bar.set_progress (progressCounter);
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
 
-    indicators::show_console_cursor (true);
+        indicators::show_console_cursor (true); });
 }
 
 void uncompressFiles (const std::string& pakPath)
@@ -35,7 +55,7 @@ void uncompressFiles (const std::string& pakPath)
         indicators::option::Lead { "$" },
         indicators::option::Remainder { "-" },
         indicators::option::End { " ]" },
-        indicators::option::PostfixText { "Loading dependency 1/4" },
+        indicators::option::PostfixText {},
         indicators::option::ForegroundColor { indicators::Color::white },
         indicators::option::ShowPercentage { true },
         indicators::option::FontStyles { std::vector<indicators::FontStyle> { indicators::FontStyle::bold } }
@@ -43,9 +63,9 @@ void uncompressFiles (const std::string& pakPath)
 
     int progressCounter = 0;
     reader.unpackAllFiles ("out/",
-                           [&] (int NumFiles, const std::string& filename)
+                           [&] (int numFiles, const std::string& filename)
                            {
-                               int incAmount = 100 / NumFiles;
+                               int incAmount = 100 / numFiles;
                                bar.set_option (indicators::option::PostfixText { "ProcessingFile: " + filename });
                                progressCounter += incAmount;
                                bar.set_progress (progressCounter);

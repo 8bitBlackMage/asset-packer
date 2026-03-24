@@ -14,7 +14,7 @@ public:
     PackReader (const std::string& path);
 
     template <ProgressFunction F>
-    void unpackAllFiles (const std::string& outputPath, F&& progressFunction = {})
+    void unpackAllFiles (const std::string& outputPath, F&& progressFunction)
     {
         if (! std::filesystem::is_directory (outputPath))
         {

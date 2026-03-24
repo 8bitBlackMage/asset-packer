@@ -12,6 +12,8 @@ public:
     void writeTableHeader (std::ostream& filestream);
     size_t getTableHeaderSize();
 
+    void reset() { files.clear(); }
+
     void readTableHeader (std::istream& filestream);
 
     std::map<std::string, File> files;

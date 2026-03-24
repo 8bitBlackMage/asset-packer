@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.25)
 
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project(assetpacker)
 
 add_executable(${PROJECT_NAME}) 
 
 add_subdirectory(vendor/CLI11)
+
+set(CMAKE_WARN_DEPRECATED FALSE)
 add_subdirectory(vendor/indicators)
+set(CMAKE_WARN_DEPRECATED TRUE)
+
 target_sources(${PROJECT_NAME}
     PUBLIC
     main.cpp

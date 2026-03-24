@@ -15,18 +15,18 @@ void FileTable::writeTableHeader (std::ostream& filestream)
     filestream << AssetPacker::magic;
 
     auto tableSize = to_bytes (getTableSize());
-    filestream.write (tableSize.data(), tableSize.size());
+    filestream.write ((char*) tableSize.data(), tableSize.size());
     //fill in table.
     for (auto& file : files)
     {
         filestream.write (file.first.data(), file.first.length());
         filestream << '\0';
         auto posArray = to_bytes (file.second.positionInTable);
-        filestream.write (posArray.data(), posArray.size());
+        filestream.write ((char*) posArray.data(), posArray.size());
         auto sizeArray = to_bytes (file.second.size);
-        filestream.write (sizeArray.data(), sizeArray.size());
+        filestream.write ((char*) sizeArray.data(), sizeArray.size());
         auto compressedSizeArray = to_bytes (file.second.compressedSize);
-        filestream.write (compressedSizeArray.data(), compressedSizeArray.size());
+        filestream.write ((char*) compressedSizeArray.data(), compressedSizeArray.size());
     }
 }
 
@@ -66,8 +66,8 @@ void FileTable::readTableHeader (std::istream& filestream)
     }
     delete[] magicCheck;
 
-    std::array<char, 8> tableSizeBuff;
-    filestream.read (tableSizeBuff.data(), tableSizeBuff.size());
+    std::array<unsigned char, 8> tableSizeBuff;
+    filestream.read ((char*) tableSizeBuff.data(), tableSizeBuff.size());
 
     size_t tableSize;
     from_bytes (tableSizeBuff, tableSize);
@@ -78,18 +78,18 @@ void FileTable::readTableHeader (std::istream& filestream)
         std::getline (filestream, fileName, '\0');
 
         size_t filePosition;
-        std::array<char, 8> filePositionBuff;
-        filestream.read (filePositionBuff.data(), filePositionBuff.size());
+        std::array<unsigned char, 8> filePositionBuff;
+        filestream.read ((char*) filePositionBuff.data(), filePositionBuff.size());
         from_bytes (filePositionBuff, filePosition);
 
         size_t fileSize;
-        std::array<char, 8> fileSizeBuff;
-        filestream.read (fileSizeBuff.data(), fileSizeBuff.size());
+        std::array<unsigned char, 8> fileSizeBuff;
+        filestream.read ((char*) fileSizeBuff.data(), fileSizeBuff.size());
         from_bytes (fileSizeBuff, fileSize);
 
         size_t compressedFileSize;
-        std::array<char, 8> compressedFileSizeBuff;
-        filestream.read (compressedFileSizeBuff.data(), compressedFileSizeBuff.size());
+        std::array<unsigned char, 8> compressedFileSizeBuff;
+        filestream.read ((char*) compressedFileSizeBuff.data(), compressedFileSizeBuff.size());
         from_bytes (compressedFileSizeBuff, compressedFileSize);
 
         files[fileName] = File { fileSize, compressedFileSize, filePosition };
