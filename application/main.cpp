@@ -1,6 +1,5 @@
 #include "CLI/CLI.hpp"
 #include <CLI/CLI.hpp>
-#include <asset-packer.hpp>
 #include <indicators/cursor_control.hpp>
 #include <indicators/progress_bar.hpp>
 #include <pack-reader.hpp>

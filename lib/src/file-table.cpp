@@ -1,4 +1,4 @@
-#include "asset-packer.hpp"
+
 #include <array>
 #include <byte-helpers.hpp>
 #include <cstddef>
@@ -6,13 +6,14 @@
 #include <iostream>
 #include <istream>
 #include <string>
+
 namespace AssetPacker
 {
 
 void FileTable::writeTableHeader (std::ostream& filestream)
 {
     filestream.seekp (std::ios::beg);
-    filestream << AssetPacker::magic;
+    filestream << magic;
 
     auto tableSize = to_bytes (getTableSize());
     filestream.write ((char*) tableSize.data(), tableSize.size());
@@ -33,7 +34,7 @@ void FileTable::writeTableHeader (std::ostream& filestream)
 size_t FileTable::getTableHeaderSize()
 {
     size_t ret = 0;
-    ret += AssetPacker::magic.size() + 1;
+    ret += magic.size() + 1;
     ret += sizeof (size_t); //table size
     ret += getTableSize();
     return ret;
@@ -59,7 +60,7 @@ void FileTable::readTableHeader (std::istream& filestream)
     char* magicCheck = new char[4];
     filestream.read (magicCheck, 4);
 
-    if (magicCheck != AssetPacker::magic)
+    if (magicCheck != magic)
     {
         delete[] magicCheck;
         return;

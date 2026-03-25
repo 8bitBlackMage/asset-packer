@@ -1,16 +1,24 @@
 cmake_minimum_required(VERSION 3.25)
-
+include(FetchContent)
 
 
 project(assetpacker)
 
 add_executable(${PROJECT_NAME}) 
 
-add_subdirectory(vendor/CLI11)
+FetchContent_Declare(
+    CLI11
+    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+    GIT_TAG v2.6.2
+)
 
-set(CMAKE_WARN_DEPRECATED FALSE)
-add_subdirectory(vendor/indicators)
-set(CMAKE_WARN_DEPRECATED TRUE)
+FetchContent_Declare(
+    indicators
+    GIT_REPOSITORY https://github.com/p-ranav/indicators.git
+)
+
+FetchContent_MakeAvailable(CLI11 indicators)
+
 
 target_sources(${PROJECT_NAME}
     PUBLIC

@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdio>
 #include <file-table.hpp>
-#include <iostream>
 #include <sstream>
 
 SCENARIO ("byte helpers can read an array of chars")

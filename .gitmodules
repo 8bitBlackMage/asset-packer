@@ -1,9 +1,1 @@
-[submodule "application/vendor/CLI11"]
-	path = application/vendor/CLI11
-	url = https://github.com/CLIUtils/CLI11.git
-[submodule "application/vendor/indicators"]
-	path = application/vendor/indicators
-	url = https://github.com/p-ranav/indicators.git
-[submodule "vendor/Catch2"]
-	path = vendor/Catch2
-	url = https://github.com/catchorg/Catch2.git
+

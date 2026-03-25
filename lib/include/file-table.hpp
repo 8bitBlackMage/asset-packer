@@ -1,6 +1,7 @@
 #pragma once
-#include <asset-packer.hpp>
+#include <file.hpp>
 #include <map>
+#include <ostream>
 
 namespace AssetPacker
 {
@@ -17,6 +18,8 @@ public:
     void readTableHeader (std::istream& filestream);
 
     std::map<std::string, File> files;
+
+    const std::string magic = "PAK1\0";
 
 private:
     size_t getTableSize();

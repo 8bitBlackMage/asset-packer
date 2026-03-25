@@ -9,12 +9,11 @@ project(lib-asset-packer)
 add_library(${PROJECT_NAME} STATIC)
 
 
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 target_sources(${PROJECT_NAME} PUBLIC 
-                src/asset-packer.cpp
                 src/pack-reader.cpp
                 src/pack-writer.cpp      
                 src/file-table.cpp
