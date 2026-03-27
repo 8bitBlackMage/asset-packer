@@ -4,10 +4,13 @@
 #include <fstream>
 #include <progress-function.hpp>
 #include <string>
-#include <vector>
 
 namespace AssetPacker
 {
+/**
+ * @brief 
+ * 
+*/
 class PackReader
 {
 public:
@@ -23,20 +26,16 @@ public:
 
         for (auto& file : table.files)
         {
-            std::vector<char> output;
-            if (! unpackFile (file.first, output))
-            {
-                continue;
-            }
+            auto output = unpackFile (file.first);
 
             auto outFile = std::basic_ofstream<char> (outputPath + "/" + file.first, std::ios::binary);
-            outFile.write (output.data(), output.size());
+            outFile.write ((char*) output.getData(), output.getSize());
 
             progressFunction (table.files.size(), file.first);
         }
     }
 
-    bool unpackFile (const std::string& fileName, std::vector<char>& outputBuffer);
+    File unpackFile (const std::string& fileName);
     size_t getNumFiles() { return table.files.size(); }
 
 private:

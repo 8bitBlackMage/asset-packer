@@ -1,6 +1,7 @@
 
 #include <array>
 #include <byte-helpers.hpp>
+#include <cassert>
 #include <cstddef>
 #include <file-table.hpp>
 #include <iostream>
@@ -13,12 +14,16 @@ namespace AssetPacker
 void FileTable::writeTableHeader (std::ostream& filestream)
 {
     filestream.seekp (std::ios::beg);
-    filestream << magic;
+    filestream << magic.data();
+
+    auto versionArray = to_bytes (versionNumber);
+
+    filestream.write ((char*) versionArray.data(), versionArray.size());
 
     auto tableSize = to_bytes (getTableSize());
     filestream.write ((char*) tableSize.data(), tableSize.size());
     //fill in table.
-    for (auto& file : files)
+    for (const auto& file : files)
     {
         filestream.write (file.first.data(), file.first.length());
         filestream << '\0';
@@ -31,19 +36,20 @@ void FileTable::writeTableHeader (std::ostream& filestream)
     }
 }
 
-size_t FileTable::getTableHeaderSize()
+size_t FileTable::getTableHeaderSize() const
 {
     size_t ret = 0;
     ret += magic.size() + 1;
+    ret += sizeof (int);
     ret += sizeof (size_t); //table size
     ret += getTableSize();
     return ret;
 }
 
-size_t FileTable::getTableSize()
+size_t FileTable::getTableSize() const
 {
     size_t ret = 0;
-    for (auto entry : files)
+    for (const auto& entry : files)
     {
         ret += entry.first.length() + 1;
         ret += sizeof (entry.second.positionInTable);
@@ -57,43 +63,50 @@ void FileTable::readTableHeader (std::istream& filestream)
 {
     files.clear();
     filestream.seekg (std::ios::beg);
-    char* magicCheck = new char[4];
-    filestream.read (magicCheck, 4);
+    std::array<char, 3> magicCheck;
+    filestream.read (magicCheck.data(), sizeof (magicCheck));
 
     if (magicCheck != magic)
     {
-        delete[] magicCheck;
         return;
     }
-    delete[] magicCheck;
 
-    std::array<unsigned char, 8> tableSizeBuff;
+    unsigned int fileVersion = 0;
+
+    std::array<unsigned char, sizeof (int)> versionArray;
+
+    filestream.read ((char*) versionArray.data(), sizeof (int));
+    from_bytes (versionArray, fileVersion);
+
+    assert (versionNumber == fileVersion);
+
+    std::array<unsigned char, sizeof (size_t)> tableSizeBuff;
     filestream.read ((char*) tableSizeBuff.data(), tableSizeBuff.size());
 
     size_t tableSize;
     from_bytes (tableSizeBuff, tableSize);
-    int positionCounter = 0;
+    size_t positionCounter = 0;
     while (positionCounter < tableSize)
     {
         std::string fileName;
         std::getline (filestream, fileName, '\0');
 
         size_t filePosition;
-        std::array<unsigned char, 8> filePositionBuff;
+        std::array<unsigned char, sizeof (size_t)> filePositionBuff;
         filestream.read ((char*) filePositionBuff.data(), filePositionBuff.size());
         from_bytes (filePositionBuff, filePosition);
 
         size_t fileSize;
-        std::array<unsigned char, 8> fileSizeBuff;
+        std::array<unsigned char, sizeof (size_t)> fileSizeBuff;
         filestream.read ((char*) fileSizeBuff.data(), fileSizeBuff.size());
         from_bytes (fileSizeBuff, fileSize);
 
         size_t compressedFileSize;
-        std::array<unsigned char, 8> compressedFileSizeBuff;
+        std::array<unsigned char, sizeof (size_t)> compressedFileSizeBuff;
         filestream.read ((char*) compressedFileSizeBuff.data(), compressedFileSizeBuff.size());
         from_bytes (compressedFileSizeBuff, compressedFileSize);
 
-        files[fileName] = File { fileSize, compressedFileSize, filePosition };
+        files[fileName] = FileTableEntry { fileSize, compressedFileSize, filePosition };
         positionCounter += (fileName.length() + 1) + sizeof (size_t) + sizeof (size_t) + sizeof (size_t);
     }
 }

@@ -1,6 +1,7 @@
 #include "file-table.hpp"
 
 #include "zconf.h"
+#include <cassert>
 #include <fstream>
 
 #include <ios>
@@ -18,20 +19,18 @@ PackReader::PackReader (const std::string& path) : pathToPackedFile (path)
     table.readTableHeader (ifstream);
 }
 
-bool PackReader::unpackFile (const std::string& fileName, std::vector<char>& outputBuffer)
+File PackReader::unpackFile (const std::string& fileName)
 {
     if (! table.files.contains (fileName))
     {
-        return false;
     }
 
-    auto file = table.files[fileName];
+    const auto file = table.files[fileName];
 
     std::ifstream ifstream (pathToPackedFile, std::ios::binary);
 
     if (! ifstream.is_open())
     {
-        return false;
     }
 
     ifstream.seekg (file.positionInTable);
@@ -44,11 +43,9 @@ bool PackReader::unpackFile (const std::string& fileName, std::vector<char>& out
     int result = uncompress ((Bytef*) uncompressedBuffer.data(), &dstLength, (Bytef*) compressedBuffer.data(), file.compressedSize);
     if (result != 0)
     {
-        return false;
     }
 
-    outputBuffer = std::move (uncompressedBuffer);
-    return true;
+    return File (uncompressedBuffer);
 }
 
 } // namespace AssetPacker

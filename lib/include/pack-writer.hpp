@@ -23,7 +23,7 @@ public:
 
         size_t filePosition = table.getTableHeaderSize() + 1;
         ofstream.seekp (filePosition);
-        for (int i = 0; i < filePaths.size(); i++)
+        for (size_t i = 0; i < filePaths.size(); i++)
         {
             auto filePath = filePaths[i];
 
@@ -39,7 +39,10 @@ public:
             std::vector<char> compressedFile (compressedLength);
 
             auto result = compress ((Bytef*) compressedFile.data(), &compressedLength, (Bytef*) fileContents.data(), fileContents.size());
-
+            if (result != 0)
+            {
+                continue; //come back for better error handling here.
+            }
             ofstream.write (compressedFile.data(), compressedLength);
 
             auto fileName = std::filesystem::path (filePath).filename();

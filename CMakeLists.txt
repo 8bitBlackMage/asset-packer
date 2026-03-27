@@ -3,6 +3,7 @@ include(FetchContent)
 project(asset-packer LANGUAGES CXX VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_WARNING_LEVEL )
 
 FetchContent_Declare(
     Catch2
